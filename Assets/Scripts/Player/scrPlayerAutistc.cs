@@ -9,9 +9,10 @@ public class scrPlayerAutistc : MonoBehaviour
     public bool NoChao;
     public float radius, Pulo;
     public LayerMask CamadaPisavel;
+    public float ChaoTouchVel;
 
     [Header("Movimentação")]
-    public float velocidadeCorrendo;
+    public bool naRampa;
     public float velocidadeNormal;
     private float eixoX;
     private float aceleracao;
@@ -26,29 +27,47 @@ public class scrPlayerAutistc : MonoBehaviour
     {
         if (NoChao)
         {
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (ChaoTouchVel <= -20)
             {
-                aceleracao = velocidadeCorrendo * eixoX;
-                rbPlayerAutista.velocity = new Vector2(aceleracao, rbPlayerAutista.velocity.y);
-                rbPlayerAutista.gravityScale = 1f;
+                Destroy(gameObject);
             }
-            else
-            {
-                aceleracao = velocidadeNormal * eixoX;
-                rbPlayerAutista.velocity = new Vector2(aceleracao, rbPlayerAutista.velocity.y);
-                rbPlayerAutista.gravityScale = 7f;
-            }
-            if(Input.GetButtonDown("Jump"))
+
+            if (Input.GetButtonDown("Jump"))
             {
                 rbPlayerAutista.AddForce(new Vector2(0f, Pulo), ForceMode2D.Impulse);
             }
         }
-
+        else
+        {
+            ChaoTouchVel = rbPlayerAutista.velocity.y;
+        }
+        if (!naRampa || NoChao)
+        {
+            aceleracao = velocidadeNormal * eixoX;
+            rbPlayerAutista.velocity = new Vector2(aceleracao, rbPlayerAutista.velocity.y);
+        }
+        
         NoChao = Physics2D.OverlapCircle(LocalPe.transform.position, radius, CamadaPisavel);
     }
 
     void Update()
     {
         eixoX = Input.GetAxis("Horizontal");
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Rampa")
+        {
+            naRampa = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Rampa")
+        {
+            naRampa = false;
+        }
     }
 }

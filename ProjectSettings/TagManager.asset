@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Player2
   - Boost
+  - Player1
+  - Rampa
   layers:
   - Default
   - TransparentFX
